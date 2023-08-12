@@ -5,14 +5,10 @@ namespace TestWebApi230809.Services
 {
     public class StoryApi : IStoryApi
     {
-
-        //private string BaseApiUrl = "https://hacker-news.firebaseio.com/v0";
-        private string BaseApiUrl = "";
+        private readonly string BaseApiUrl;
         public StoryApi(IConfiguration configuration)
         {
-            //var uriString = configuration["BaseApiUrl"];
-            var uriString = configuration["BaseApiUrl"];
-            BaseApiUrl = uriString;
+            BaseApiUrl = configuration["BaseApiUrl"] ?? "";
         }
         public async Task<List<int>> GetBestStoryIds()
         {
@@ -23,14 +19,30 @@ namespace TestWebApi230809.Services
                 string bestStoryIds = await httpClient.GetStringAsync(bestStoriesUrl);
                 storyIds = JsonConvert.DeserializeObject<List<int>>(bestStoryIds);                
             }
-            return storyIds;
+            return storyIds ?? new List<int>();
         }
         public async Task<Story> GetStory(HttpClient httpClient, int storyId)
         {
             var storyUrl = $"{BaseApiUrl}/item/{storyId}.json";
-            var storyJson = await httpClient.GetStringAsync(storyUrl);
-            var story = JsonConvert.DeserializeObject<Story>(storyJson);
-            return story;
+            var storyJsonRaw = await httpClient.GetStringAsync(storyUrl);
+            var storyJson = JsonConvert.DeserializeObject<StoryJson>(storyJsonRaw);
+            return storyJson != null ? MapToStory(storyJson) : new Story();
         }
+
+        private static Story MapToStory(StoryJson story)
+        {
+            return new Story
+            {
+                title = story.Title,
+                uri = story.Url,
+                postedBy = story.By,
+                time = UnixTimeStampToDateTime(story.Time).ToString("yyyy-MM-dd HH:mm:ss"),
+                score = story.Score,
+                commentCount = story.Descendants
+            };
+        }
+
+        // Helper method to convert Unix timestamp to DateTime
+        private static DateTime UnixTimeStampToDateTime(int unixTimeStamp) => new DateTime(1970, 1, 1).AddSeconds(unixTimeStamp);
     }
 }

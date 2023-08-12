@@ -18,22 +18,22 @@ namespace TestWebApi230809.Services.Tests
         public async Task GetBestOrderedStories_ReturnsTwoOrderedStories()
         {
             _mockStoryApi.Setup(s => s.GetBestStoryIds()).ReturnsAsync(new List<int> { 20, 10 });
-            _mockStoryApi.Setup(s => s.GetStory(It.IsAny<HttpClient>(), It.IsAny<int>())).ReturnsAsync((HttpClient httpClient, int storyId) => new Story{ Id = storyId, Score = 100-storyId });
+            _mockStoryApi.Setup(s => s.GetStory(It.IsAny<HttpClient>(), It.IsAny<int>())).ReturnsAsync((HttpClient httpClient, int storyId) => new Story{ score = 100-storyId });
 
             var stories = await _storyService.GetBestOrderedStories(10);
 
             Assert.IsNotNull(stories);
             Assert.AreEqual(2, stories.Count());            
-            Assert.IsTrue(stories.First().Score > stories.Last().Score);
-            Assert.AreEqual(stories.First().Score, 90);
-            Assert.AreEqual(stories.Last().Score, 80);
+            Assert.IsTrue(stories.First().score > stories.Last().score);
+            Assert.AreEqual(stories.First().score, 90);
+            Assert.AreEqual(stories.Last().score, 80);
         }
 
         [TestMethod()]
         public async Task GetBestOrderedStories_VerifyCacheCountTwo()
         {
             _mockStoryApi.Setup(s => s.GetBestStoryIds()).ReturnsAsync(new List<int> { 20, 10 });
-            _mockStoryApi.Setup(s => s.GetStory(It.IsAny<HttpClient>(), It.IsAny<int>())).ReturnsAsync((HttpClient httpClient, int storyId) => new Story { Id = storyId, Score = 100 - storyId });
+            _mockStoryApi.Setup(s => s.GetStory(It.IsAny<HttpClient>(), It.IsAny<int>())).ReturnsAsync((HttpClient httpClient, int storyId) => new Story { score = 100 - storyId });
 
             _storyService.ClearCache();
             Assert.AreEqual(0, _storyService.CacheCount());
@@ -50,7 +50,7 @@ namespace TestWebApi230809.Services.Tests
         public async Task GetBestOrderedStories_VerifyClearCache()
         {
             _mockStoryApi.Setup(s => s.GetBestStoryIds()).ReturnsAsync(new List<int> { 20, 10 });
-            _mockStoryApi.Setup(s => s.GetStory(It.IsAny<HttpClient>(), It.IsAny<int>())).ReturnsAsync((HttpClient httpClient, int storyId) => new Story { Id = storyId, Score = 100 - storyId });
+            _mockStoryApi.Setup(s => s.GetStory(It.IsAny<HttpClient>(), It.IsAny<int>())).ReturnsAsync((HttpClient httpClient, int storyId) => new Story { score = 100 - storyId });
 
             _storyService.ClearCache();
             Assert.AreEqual(0, _storyService.CacheCount());

@@ -26,15 +26,15 @@ namespace TestWebApi230809.Services
                     tasks.Add(GetStoryAsync(client, storyId));
                 }
                 stories.AddRange(await Task.WhenAll(tasks));
-                stories = stories.OrderByDescending(s => s.Score).ToList();
+                stories = stories.OrderByDescending(s => s.score).ToList();
             }
-            stories.ForEach(s => _storyCache.TryAdd(s.Id, s));
             return stories;
         }
         private async Task<Story> GetStoryAsync(HttpClient httpClient, int storyId)
         {
-            if (_storyCache.TryGetValue(storyId, out var story)) return story;
-            return await StoryApi.GetStory(httpClient, storyId);
+            if (!_storyCache.TryGetValue(storyId, out var story)) story = await StoryApi.GetStory(httpClient, storyId);
+            _ = _storyCache.TryAdd(storyId, story);
+            return story;
         }
         public void ClearCache() => _storyCache.Clear();
         public int CacheCount() => _storyCache.Count;
