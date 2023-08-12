@@ -11,7 +11,6 @@ namespace TestWebApi230809.Services
         /// <param name="n"> Number of stories</param>
         /// <returns></returns>
         Task<IEnumerable<Story>> GetBestOrderedStories(int n);
-        //Task<ActionResult<IEnumerable<Story>>> GetBestOrderedStories(int n);
         void ClearCache();
 
         int CacheCount();

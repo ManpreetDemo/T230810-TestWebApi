@@ -4,7 +4,6 @@ using TestWebApi230809.Services;
 
 namespace TestWebApi230809.Controllers
 {
-    //[Produces("application/json")]
     [ApiController]
     [Route("api/[controller]")]
     public class BestStoriesController : ControllerBase
@@ -18,14 +17,12 @@ namespace TestWebApi230809.Controllers
         }
 
         [HttpGet("/GetStories")]
-        //[Route("/GetStories")]
         public async Task<IEnumerable<Story>> Get(int n)
         {
             return await _storyService.GetBestOrderedStories(n);   
         }
 
         [HttpGet("/ClearStories")]
-        //[Route("/ClearStories")]
         public IActionResult ClearStoriesCache()
         {
             _storyService.ClearCache();
